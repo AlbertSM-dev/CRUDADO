@@ -31,7 +31,7 @@ namespace CRUDADO.Controllers
                 //SqlDataReader
                 connection.Open();
 
-                string sql = "SELECT * From Teacher WHERE Id > 0"; 
+                string sql = "SELECT * FROM Teacher WHERE Id > 0"; 
                 SqlCommand command = new SqlCommand(sql, connection);
                 using (SqlDataReader dataReader = command.ExecuteReader())
                 {
@@ -79,10 +79,32 @@ namespace CRUDADO.Controllers
                 return View();
             }
         }
-        public IActionResult Update()
+        public IActionResult Update(int id)
         {
-            return View();
+            string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
+            Teacher teacher = new Teacher();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string sql = $"SELECT * FROM Teacher WHERE Id='{id}'";
+                SqlCommand command = new SqlCommand(sql, connection);
+                connection.Open();
+                using (SqlDataReader dataReader = command.ExecuteReader())
+                {
+                    while (dataReader.Read())
+                    {
+                        teacher.Id = Convert.ToInt32(dataReader["Id"]);
+                        teacher.Name = Convert.ToString(dataReader["Name"]);
+                        teacher.Skills = Convert.ToString(dataReader["Skills"]);
+                        teacher.TotalStudents = Convert.ToInt32(dataReader["TotalStudents"]);
+                        teacher.Salary = Convert.ToDecimal(dataReader["Salary"]);
+                        teacher.AddedOn = Convert.ToDateTime(dataReader["AddedOn"]);
+                    }
+                }
+                connection.Close();
+            }
+            return View(teacher);
         }
+    
         [HttpPost]
         public IActionResult Update_Post(Teacher teacher)
         {
@@ -91,7 +113,7 @@ namespace CRUDADO.Controllers
                 string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    string sql = $"Update Teacher SET Name='{teacher.Name}', Skills='{teacher.Skills}', TotalStudents='{teacher.TotalStudents}', Salary='{teacher.Salary}' Where Id='{teacher.Id}'";
+                    string sql = $"UPDATE Teacher SET Name='{teacher.Name}', Skills='{teacher.Skills}', TotalStudents='{teacher.TotalStudents}', Salary='{teacher.Salary}' Where Id='{teacher.Id}'";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
                         connection.Open();
