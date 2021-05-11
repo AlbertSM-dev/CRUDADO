@@ -79,6 +79,32 @@ namespace CRUDADO.Controllers
                 return View();
             }
         }
+        public IActionResult Update()
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult Update_Post(Teacher teacher)
+        {
+            if (ModelState.IsValid)
+            {
+                string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    string sql = $"Update Teacher SET Name='{teacher.Name}', Skills='{teacher.Skills}', TotalStudents='{teacher.TotalStudents}', Salary='{teacher.Salary}' Where Id='{teacher.Id}'";
+                    using (SqlCommand command = new SqlCommand(sql, connection))
+                    {
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        connection.Close();
+                    }
+                }
+                return RedirectToAction("Index");
+            }
+            else {
+                return View();
+            }
+        }
         public IActionResult Privacy()
         {
             return View();
