@@ -75,8 +75,9 @@ namespace CRUDADO.Controllers
                     return RedirectToAction("Index");
                 }
             }
-            else
+            else { 
                 return View();
+            }
         }
         public IActionResult Privacy()
         {
