@@ -24,7 +24,32 @@ namespace CRUDADO.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            List<Teacher> teacherList = new List<Teacher>();
+            string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                //SqlDataReader
+                connection.Open();
+
+                string sql = "SELECT * From Teacher WHERE Id > 0"; 
+                SqlCommand command = new SqlCommand(sql, connection);
+                using (SqlDataReader dataReader = command.ExecuteReader())
+                {
+                    while (dataReader.Read())
+                    {
+                        Teacher teacher = new Teacher();
+                        teacher.Id = Convert.ToInt32(dataReader["Id"]);
+                        teacher.Name = Convert.ToString(dataReader["Name"]);
+                        teacher.Skills = Convert.ToString(dataReader["Skills"]);
+                        teacher.TotalStudents = Convert.ToInt32(dataReader["TotalStudents"]);
+                        teacher.Salary = Convert.ToDecimal(dataReader["Salary"]);
+                        teacher.AddedOn = Convert.ToDateTime(dataReader["AddedOn"]);
+                        teacherList.Add(teacher);
+                    }
+                }
+                connection.Close();
+            }
+            return View(teacherList);
         }
 
         public IActionResult Create()
@@ -39,7 +64,7 @@ namespace CRUDADO.Controllers
                 string connectionString = Configuration["ConnectionStrings:DefaultConnection"];
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    string sql = $"Insert Into Teacher (Name, Skills, TotalStudents, Salary) Values ('{teacher.Name}', '{teacher.Skills}','{teacher.TotalStudents}','{teacher.Salary}')";
+                    string sql = $"INSERT INTO Teacher (Name, Skills, TotalStudents, Salary) VALUES ('{teacher.Name}', '{teacher.Skills}','{teacher.TotalStudents}','{teacher.Salary}')";
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
                         command.CommandType = CommandType.Text;
